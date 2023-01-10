@@ -7,27 +7,9 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
-    public function storeNewPost(Request $request) {
-        if (!auth()->check()) {
-            return redirect('/');
-        }
-
-        $incomingFields = $request->validate([
-            'title' => 'required',
-            'body' => 'required'
-        ]);
-
-        $incomingFields['title'] = strip_tags($incomingFields['title']);
-        $incomingFields['body'] = strip_tags($incomingFields['body']);
-        $incomingFields['user_id'] = auth()->id();
-        $newPost = Post::create($incomingFields);
-
-        return redirect('/');
-    }
-
-    public function editScreen(Post $post) {
+    public function deletePost(Post $post) {
         if (auth()->user()->id === $post['user_id']) {
-            return view('edit-post', ['post' => $post]);
+            $post->delete();
         }
         return redirect('/');
     }
@@ -49,10 +31,24 @@ class PostController extends Controller
         return redirect('/');
     }
 
-    public function deletePost(Post $post) {
-        if (auth()->user()->id === $post['user_id']) {
-            $post->delete();
+    public function showEditScreen(Post $post) {
+        if (auth()->user()->id !== $post['user_id']) {
+            return redirect('/');
         }
+
+        return view('edit-post', ['post' => $post]);
+    }
+
+    public function createPost(Request $request) {
+        $incomingFields = $request->validate([
+            'title' => 'required',
+            'body' => 'required'
+        ]);
+
+        $incomingFields['title'] = strip_tags($incomingFields['title']);
+        $incomingFields['body'] = strip_tags($incomingFields['body']);
+        $incomingFields['user_id'] = auth()->id();
+        Post::create($incomingFields);
         return redirect('/');
     }
 }

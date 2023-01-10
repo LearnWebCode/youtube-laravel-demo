@@ -8,37 +8,7 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    public function home() {
-        $posts = [];
-        if (auth()->check()) {
-            $posts = auth()->user()->posts()->latest()->get();
-        }
-        return view('home', ['posts' => $posts]);
-    }
-
-    public function register(Request $request) {
-        if (auth()->check()) {
-            return 'You are already logged in.';
-        }
-
-        $incomingFields = $request->validate([
-            'name' => ['required', 'min:3', 'max:10', Rule::unique('users', 'name')],
-            'email' => ['required', 'email', Rule::unique('users', 'email')],
-            'password' => ['required', 'min:8', 'max:200']
-        ]);
-
-        $incomingFields['password'] = bcrypt($incomingFields['password']);
-
-        $user = User::create($incomingFields);
-        auth()->login($user);
-        return redirect('/');
-    }
-
     public function login(Request $request) {
-        if (auth()->check()) {
-            return 'You are already logged in.';
-        }
-
         $incomingFields = $request->validate([
             'loginname' => 'required',
             'loginpassword' => 'required'
@@ -53,6 +23,19 @@ class UserController extends Controller
 
     public function logout() {
         auth()->logout();
+        return redirect('/');
+    }
+
+    public function register(Request $request) {
+        $incomingFields = $request->validate([
+            'name' => ['required', 'min:3', 'max:10', Rule::unique('users', 'name')],
+            'email' => ['required', 'email', Rule::unique('users', 'email')],
+            'password' => ['required', 'min:8', 'max:200']
+        ]);
+
+        $incomingFields['password'] = bcrypt($incomingFields['password']);
+        $user = User::create($incomingFields);
+        auth()->login($user);
         return redirect('/');
     }
 }

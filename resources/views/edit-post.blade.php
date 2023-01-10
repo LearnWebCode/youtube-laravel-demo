@@ -6,13 +6,12 @@
   <title>Document</title>
 </head>
 <body>
-  <a href="/">&laquo; Back home</a>
   <h1>Edit Post</h1>
   <form action="/edit-post/{{$post->id}}" method="POST">
     @csrf
     @method('PUT')
     <input type="text" name="title" value="{{$post->title}}">
-    <textarea name="body" style="display: block; width: 500px;">{{$post->body}}</textarea>
+    <textarea name="body">{{$post->body}}</textarea>
     <button>Save Changes</button>
   </form>
 </body>
